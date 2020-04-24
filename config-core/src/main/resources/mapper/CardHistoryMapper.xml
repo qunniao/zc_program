@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhancheng.core.dao.CardHistoryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhancheng.core.entity.CardHistory">
+        <id column="id" property="id" />
+        <result column="user_card_id" property="userCardId" />
+        <result column="uid" property="uid" />
+        <result column="is_deleted" property="isDeleted" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+        <result column="type" property="type" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, user_card_id, uid, is_deleted, gmt_create, gmt_modified, type
+    </sql>
+    <select id="queryList" resultType="com.zhancheng.core.vo.CardHistoryVo">
+        SELECT
+	        zch.id,
+	        zch.user_card_id,
+	        zch.num,
+	        zch.type,
+	        zu.*
+        FROM
+	        zc_card_history zch
+	    LEFT JOIN zc_user zu
+	    ON zu.uid = zch.uid AND zu.is_deleted = 0
+	    <where>
+            zch.type = 1
+            <if test="ch.uid != null" >    AND zch.uid = #{ch.uid} </if>
+        </where>
+    </select>
+
+</mapper>

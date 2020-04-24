@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhancheng.core.dao.ModuleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhancheng.core.entity.Module">
+        <id column="id" property="id" />
+        <result column="module_name" property="moduleName" />
+        <result column="price" property="price" />
+        <result column="labor" property="labor" />
+        <result column="is_deleted" property="isDeleted" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, module_name, price, labor, is_deleted, gmt_create, gmt_modified
+    </sql>
+
+
+    <select id="queryInfo" resultType="ModuleCategoryDto">
+
+        SELECT
+	    zm.id moduleCid,
+	    module_name,
+	    price,
+	    labor,
+	    zc.id categoryId,
+	    zc.cid categoryCid,
+	    zc.type_name,
+	    zc.cover
+    FROM
+	    zc_module zm
+	LEFT JOIN zc_category zc ON zm.cid = zc.id AND zc.is_deleted = 0
+
+    WHERE zm.id = #{id} AND zm.is_deleted = 0
+    </select>
+    <select id="queryModuleList" resultType="com.zhancheng.core.entity.Module">
+        SELECT * FROM zc_module zc WHERE zc.cid = #{cid} AND zc.is_deleted = 0
+    </select>
+
+</mapper>

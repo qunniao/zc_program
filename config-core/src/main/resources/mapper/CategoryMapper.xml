@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhancheng.core.dao.CategoryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhancheng.core.dto.CategoryDto">
+        <id column="id" property="id" />
+        <result column="cid" property="cid" />
+        <result column="type_name" property="typeName" />
+        <result column="cover" property="cover" />
+        <result column="level" property="level" />
+        <result column="sort" property="sort" />
+        <result column="is_deleted" property="isDeleted" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+        <collection property="category" column="id" select="getCategory"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, cid, type_name, cover, level, sort, is_deleted, gmt_create, gmt_modified
+    </sql>
+
+    <select id="findByLevel" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List"/> FROM zc_category WHERE is_deleted = 0 AND level = 1
+        ORDER BY gmt_create DESC
+    </select>
+
+    <select id="getCategory" resultType="com.zhancheng.core.entity.Category">
+        select <include refid="Base_Column_List"/>
+        from zc_category WHERE is_deleted = 0 AND cid = #{id}
+
+    </select>
+    <select id="queryInfo" resultType="com.zhancheng.core.dto.CategoryDto">
+    SELECT
+	    zc1.*,
+	    zc2.type_name superiorTypeName
+    FROM
+	    zc_category zc1
+	LEFT JOIN zc_category zc2
+	ON zc1.cid = zc2.id
+	WHERE zc1.is_deleted = 0 AND zc1.id = #{id}
+
+    </select>
+
+    <select id="queryList" resultMap="BaseResultMap">
+        SELECT * FROM zc_category zc
+        WHERE zc.cid = #{cid}
+    </select>
+</mapper>

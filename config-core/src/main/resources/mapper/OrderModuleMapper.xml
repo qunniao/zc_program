@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhancheng.core.dao.OrderModuleMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhancheng.core.entity.OrderModule">
+        <id column="id" property="id" />
+        <result column="module_json" property="moduleJson" />
+        <result column="is_deleted" property="isDeleted" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, module_json, is_deleted, gmt_create, gmt_modified
+    </sql>
+    <delete id="deleteByUid">
+       DELETE FROM zc_order_module WHERE uid = #{uid} AND id IN
+       <foreach collection="ids" item="id"  open="(" separator="," close=")">
+           #{id}
+       </foreach>
+
+    </delete>
+
+
+    <select id="getOrderModule" resultType="OrderModuleDto">
+    SELECT
+        zom.id orderModuleId,
+	    num,
+	    total_price,
+	    zom.gmt_create,
+	    zp.product_name,
+	    zu.nickname,
+	    zu.cover
+    FROM
+	    zc_order_module zom
+	LEFT JOIN zc_product zp ON zp.pid = zom.pid
+	AND zp.is_deleted = 0
+	LEFT JOIN zc_user zu ON zu.uid = zom.uid
+	AND zu.is_deleted = 0
+    WHERE
+	    zom.is_deleted = 0
+    ORDER BY
+	    zom.gmt_create DESC
+    </select>
+
+    <select id="getOrderList"  resultType="java.util.Map">
+
+    SELECT zom.*, zu.*, zc.id categoryId, zc.type_name, zc.cover categoryCover FROM  zc_order_module zom
+    LEFT JOIN zc_user zu
+    ON zom.uid = zu.uid
+    LEFT JOIN zc_category zc
+    ON zom.pid = zc.id
+    WHERE zom.is_deleted = 0
+    <if test="uid != null">
+        AND zom.uid = #{uid}
+    </if>
+    ORDER BY zom.gmt_create DESC
+
+    </select>
+    <select id="getOrderInfo"  resultType="java.util.Map">
+    SELECT zom.*,  zu.*, zc.id categoryId, zc.type_name, zc.cover categoryCover FROM  zc_order_module zom
+    LEFT JOIN zc_user zu
+    ON zom.uid = zu.uid
+    LEFT JOIN zc_category zc
+    ON zom.pid = zc.id
+    WHERE zom.is_deleted = 0
+    AND zom.id = #{id}
+    </select>
+
+    <select id="countHeadcount" resultType="java.lang.Integer">
+        select COUNT(DISTINCT uid, uid ) from zc_order_module  WHERE is_deleted = 0
+    </select>
+
+</mapper>

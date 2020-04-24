@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhancheng.core.dao.CaseMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhancheng.core.entity.Case">
+        <id column="cid" property="cid"/>
+        <result column="sid" property="sid"/>
+        <result column="tid" property="tid"/>
+        <result column="name" property="name"/>
+        <result column="price" property="price"/>
+        <result column="content" property="content"/>
+        <result column="cover" property="cover"/>
+        <result column="mobile_detail" property="mobileDetail"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="gmt_create" property="gmtCreate"/>
+        <result column="gmt_modified" property="gmtModified"/>
+        <result column="is_recommend" property="recommend"/>
+        <association property="caseLabels" column="tid" select="com.zhancheng.core.dao.CaseLabelMapper.getCaseLabelInfo"/>
+        <collection property="caseAttrs" column="cid" select="com.zhancheng.core.dao.CaseAttrMapper.getInfo"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        cid, sid, tid, name, price, content, cover, is_recommend, mobile_detail, is_deleted, gmt_create, gmt_modified
+    </sql>
+
+    <select id="queryList" resultMap="BaseResultMap">
+       select * FROM zc_case zc
+        WHERE zc.is_deleted = 0
+        ORDER BY zc.gmt_create DESC
+    </select>
+
+    <select id="queryInfo" resultMap="BaseResultMap">
+        select <include refid="Base_Column_List"/>
+        FROM zc_case zc
+        WHERE zc.is_deleted = 0 AND zc.cid = #{cid}
+    </select>
+
+
+    <select id="getList" resultType="com.zhancheng.core.vo.CaseListVo">
+        SELECT
+            zc.cid,
+            zc.tid,
+            zc.name,
+            zcl.label_name,
+            zc.cover,
+            zc.price,
+            GROUP_CONCAT(IFNULL(zca.attr_name,"") ORDER BY zca.aid) attrName,
+            GROUP_CONCAT(IFNULL(zca.attr_value, "") ORDER BY zca.aid) attrValue
+        FROM
+            zc_case zc
+        LEFT JOIN zc_case_label zcl
+        ON zc.tid = zcl.bid AND zcl.is_deleted = 0
+        LEFT JOIN zc_case_attr zca
+        ON zc.cid = zca.cid  AND zcl.is_deleted = 0
+        WHERE zc.is_deleted = 0
+        <if test="tid != null">
+            AND zcl.bid = #{tid} OR zcl.pid = #{tid}
+        </if>
+        <if test="keyword != null">
+            AND zc.name like CONCAT("%", #{keyword}, "%")
+        </if>
+        GROUP BY zc.cid
+        ORDER BY zc.gmt_create DESC
+    </select>
+
+</mapper>

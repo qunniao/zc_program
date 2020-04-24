@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.1.8.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>com.zhancheng</groupId>
+    <artifactId>zc-program</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>zc-program</name>
+    <description>Demo project for Spring Boot</description>
+    <packaging>pom</packaging>
+    <modules>
+        <!--        共用的核心配置      -->
+        <module>config-core</module>
+        <!--        小程序接口      -->
+        <module>applet-service</module>
+        <!--        后端管理接口      -->
+        <module>backstage-service</module>
+<!--        &lt;!&ndash;        feign负载均衡代替ribbon      &ndash;&gt;-->
+<!--        <module>feign-service</module>-->
+<!--        &lt;!&ndash;        gateway网关代替zuul      &ndash;&gt;-->
+<!--        <module>gateway-service</module>-->
+<!--        &lt;!&ndash;        负载均衡      &ndash;&gt;-->
+<!--        <module>ribbon-service</module>-->
+<!--        &lt;!&ndash;        动态路由      &ndash;&gt;-->
+<!--        <module>zuul-service</module>-->
+    </modules>
+
+    <properties>
+        <java.version>1.8</java.version>
+    </properties>
+
+    <dependencies>
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter</artifactId>-->
+<!--        </dependency>-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

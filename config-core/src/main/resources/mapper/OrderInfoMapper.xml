@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhancheng.core.dao.OrderInfoMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhancheng.core.entity.OrderInfo">
+        <id column="oid" property="oid" />
+        <result column="sid" property="sid" />
+        <result column="uid" property="uid" />
+        <result column="order_number" property="orderNumber" />
+        <result column="total_price" property="totalPrice" />
+        <result column="pay_money" property="payMoney" />
+        <result column="pay_way" property="payWay" />
+        <result column="contact_name" property="contactName" />
+        <result column="contact_phone" property="contactPhone" />
+        <result column="contact_address" property="contactAddress" />
+        <result column="pay_time" property="payTime" />
+        <result column="pay_platform" property="payPlatform" />
+        <result column="pay_number" property="payNumber" />
+        <result column="send_way" property="sendWay" />
+        <result column="freight" property="freight" />
+        <result column="order_state" property="orderState" />
+        <result column="is_deleted" property="isDeleted" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        oid, sid, uid, order_number, total_price, pay_money, pay_way, contact_name, contact_phone, contact_address, pay_time, pay_platform, pay_number, send_way, freight, order_state, is_deleted, gmt_create, gmt_modified
+    </sql>
+    <select id="getOrderInfo" resultType="java.util.Map">
+    SELECT
+	    tb2.*,
+	    zpi.url
+    FROM
+	(
+	SELECT
+		tb1.*,
+		zp.product_name
+	FROM
+		(
+		SELECT
+			zoi.*,
+			zu.nickname,
+			zop.product_num,
+			zop.product_price,
+			zop.spu_id
+		FROM
+			zc_order_info zoi
+			LEFT JOIN zc_user zu ON zu.uid = zoi.uid
+			LEFT JOIN zc_order_product zop ON zop.order_number = zoi.order_number
+		WHERE
+			zoi.order_state = 1
+		) tb1
+		LEFT JOIN zc_product zp ON zp.pid = tb1.spu_id
+	) tb2
+	LEFT JOIN zc_product_image zpi ON zpi.pid = tb2.spu_id
+WHERE
+	zpi.is_cover = 1 AND zpi.is_deleted = 0
+    </select>
+    <select id="getOrderByState" resultType="java.util.Map">
+        SELECT
+            zoi.*,
+            zu.nickname
+        FROM
+            zc_order_info zoi
+            LEFT JOIN zc_user zu ON zu.uid = zoi.uid
+        <where>
+            zoi.is_deleted = 0
+            <if test="orderState != null">
+                AND zoi.order_state = #{orderState}
+            </if>
+            <if test="uid != null">
+                AND zoi.uid = #{uid}
+            </if>
+        </where>
+        ORDER BY
+            zoi.gmt_create DESC
+
+    </select>
+
+</mapper>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhancheng.core.dao.OrderCartMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhancheng.core.entity.OrderCart">
+        <id column="cid" property="cid" />
+        <result column="sid" property="sid" />
+        <result column="uid" property="uid" />
+        <result column="sku_id" property="skuId" />
+        <result column="spu_id" property="spuId" />
+        <result column="product_name" property="productName" />
+        <result column="product_num" property="productNum" />
+        <result column="product_price" property="productPrice" />
+        <result column="is_deleted" property="isDeleted" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        cid, sid, uid, sku_id, spu_id, product_name, product_num, product_price, is_deleted, gmt_create, gmt_modified
+    </sql>
+    <select id="queryCart" resultType="com.zhancheng.core.vo.OrderCartVo">
+        SELECT
+            zpgs.sp1,
+            zpgs.sp2,
+            zpgs.sp3,
+            zpgs.pic,
+            zpi.bid,
+            zpi.url productImage,
+            zoc.*
+        FROM
+            zc_order_cart zoc
+            LEFT JOIN zc_product_image zpi ON zpi.pid = zoc.spu_id
+            AND zpi.is_deleted = 0
+            AND zpi.is_cover = 1
+            LEFT JOIN zc_product_guige_sku zpgs ON zpgs.sku_id = zoc.sku_id
+            WHERE zoc.uid = #{uid} AND zoc.is_deleted = 0
+    	    ORDER BY zoc.gmt_create DESC
+    </select>
+
+</mapper>

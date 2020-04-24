@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhancheng.core.dao.ProductMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhancheng.core.entity.Product">
+        <id column="pid" property="pid" />
+        <result column="pt_id" property="ptId" />
+        <result column="sid" property="sid" />
+        <result column="product_name" property="productName" />
+        <result column="product_intro" property="productIntro" />
+        <result column="price" property="price" />
+        <result column="market_price" property="marketPrice" />
+        <result column="price_unit" property="priceUnit" />
+        <result column="store" property="store" />
+        <result column="is_deleted" property="isDeleted" />
+        <result column="is_recommend" property="isRecommend" />
+        <result column="status" property="status" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+        <association property="productDetailMobile" resultMap="com.zhancheng.core.dao.ProductDetailMobileMapper.BaseResultMap"/>
+        <association property="productDetailPc" column="pid" select="com.zhancheng.core.dao.ProductDetailPcMapper.getInfoByPid"/>
+        <collection property="productParam" column="pid" select="com.zhancheng.core.dao.ProductParamMapper.getInfo"/>
+        <collection property="productImage" resultMap="com.zhancheng.core.dao.ProductImageMapper.BaseResultMap"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        pid, sid, product_name, product_intro, price, market_price, price_unit, store, status,is_deleted, gmt_create, gmt_modified
+    </sql>
+    <select id="queryProductInfo" resultType="com.zhancheng.core.dto.ProductDto">
+    SELECT
+        zp.pid,
+        zp.product_name productName,
+        zp.price,
+        zp.market_price marketPrice,
+        zp.price_unit priceUnit,
+        zp.product_intro productIntro,
+        table1.typeName,
+        table1.superiorTypeName,
+        table1.tid,
+        table1.superiorTid,
+        group_concat(zpi.url ORDER BY is_cover DESC) carousel
+    FROM
+    (SELECT
+        zp.pid,
+        zpt1.tid,
+        zpt2.tid superiorTid,
+				zpt1.type_name typeName,
+				zpt2.type_name superiorTypeName
+	FROM
+		zc_product_type zpt1
+		LEFT JOIN zc_product_type zpt2 ON zpt1.pid = zpt2.tid
+		LEFT JOIN zc_product zp ON zp.pt_id = zpt1.tid
+	WHERE
+		zp.pid = #{pid}
+	) table1
+	JOIN zc_product zp ON table1.pid = zp.pid
+	LEFT JOIN
+	zc_product_image zpi ON zpi.pid = zp.pid
+    </select>
+
+    <select id="queryDetails" resultMap="BaseResultMap">
+
+        SELECT
+            zp.*,
+            zpdm.*,
+            zpdp.*,
+            zpp.*,
+            zpi.*
+        FROM
+            zc_product zp
+            LEFT JOIN zc_product_detail_mobile zpdm
+            ON zpdm.pid = zp.pid AND zpdm.is_deleted = 0
+            LEFT JOIN zc_product_detail_pc zpdp
+            ON zpdp.pid = zp.pid AND zpdp.is_deleted = 0
+            LEFT JOIN zc_product_param zpp
+            ON zpp.pid = zp.pid AND zpp.is_deleted = 0
+            LEFT JOIN zc_product_image zpi
+            ON zpi.pid = zp.pid AND zpi.is_deleted = 0
+            WHERE zp.pid = #{pid} AND zp.is_deleted = 0
+            ORDER BY zpi.is_cover DESC
+
+    </select>
+    <select id="queryProductParam" resultType="com.zhancheng.core.dto.ProductParamDto">
+    SELECT
+	    zcn.nid,
+	    zcn.name n_name,
+			GROUP_CONCAT(zcv.vid) vid,
+			GROUP_CONCAT(IF(zcv.name is Null,'',zcv.name)) vName
+    FROM
+	    zc_product_attr_value zpav
+	LEFT JOIN zc_attr_name zcn ON zpav.nid = zcn.nid
+	LEFT JOIN zc_attr_value zcv ON zpav.vid = zcv.vid
+    WHERE
+    zpav.pid = #{pid} AND zpav.is_sku = #{sKuId}
+	GROUP BY zpav.nid
+    </select>
+    <select id="querySkuParam" resultType="com.zhancheng.core.dto.SkuDto">
+    SELECT
+	    GROUP_CONCAT(sku_id) skuId,
+	    GROUP_CONCAT(IF(price is Null,0.00,price)) price,
+	    GROUP_CONCAT(IF(num is Null,0,num)) num,
+	    GROUP_CONCAT(IF(sku_name is Null,'',sku_name)) skuName
+    FROM
+	    zc_product_sku zps
+    WHERE
+	    pid = #{pid}
+	AND is_deleted = 0
+	GROUP BY pid
+    </select>
+    <select id="getProduct" resultType="java.util.Map">
+    SELECT
+	    tb1.*,
+	    IFNULL( tb2.count, 0 ) count
+    FROM(
+	SELECT
+		zp.*,
+		zpt.type_name type_name,
+		zpi.url
+	FROM
+		zc_product zp
+		LEFT JOIN zc_product_type zpt ON zp.pt_id = zpt.tid
+		LEFT JOIN zc_product_image zpi ON zpi.pid = zp.pid
+		AND zpi.is_cover = 1
+	WHERE
+		zp.is_deleted = 0
+	) tb1
+	LEFT JOIN ( SELECT count(*) count, zop.spu_id FROM zc_order_product zop GROUP BY zop.spu_id ) tb2 ON tb1.pid = tb2.spu_id
+	ORDER BY gmt_create DESC
+    </select>
+
+    <select id="queryList" resultType="com.zhancheng.core.vo.ProductListVo">
+        SELECT
+            zp.pid,
+            zp.status
+            pt_id,
+            zp.product_name,
+            price,
+            market_price,
+            price_unit,
+            IFNULL(SUM(zop.product_num),0) salesNum,
+            zpt.tid,
+            zpt.type_name
+        FROM
+            zc_product zp
+        LEFT JOIN zc_order_product zop
+        ON zop.spu_id = zp.pid AND zop.is_deleted = 0
+        LEFT JOIN zc_product_type zpt
+        ON zp.pt_id = zpt.tid AND zpt.is_deleted = 0
+        <where>
+            zp.is_deleted = 0
+            <if test="tid != null">
+               AND zpt.tid = #{tid} OR zpt.pid = #{tid}
+            </if>
+        </where>
+        GROUP BY zp.pid
+        ORDER BY zp.price ${sort}
+    </select>
+</mapper>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhancheng.core.dao.StoreMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhancheng.core.entity.Store">
+        <id column="sid" property="sid" />
+        <result column="uid" property="uid" />
+        <result column="store_name" property="storeName" />
+        <result column="store_phone" property="storePhone" />
+        <result column="is_work" property="isWork" />
+        <result column="store_longitude" property="storeLongitude" />
+        <result column="store_latitude" property="storeLatitude" />
+        <result column="store_address" property="storeAddress" />
+        <result column="province" property="province" />
+        <result column="city" property="city" />
+        <result column="county" property="county" />
+        <result column="store_cover" property="storeCover" />
+        <result column="store_intro" property="storeIntro" />
+        <result column="is_deleted" property="isDeleted" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        sid, uid, store_name, store_phone, is_work, store_longitude, store_latitude, store_address, province, city, county, store_cover, store_intro, is_deleted, gmt_create, gmt_modified
+    </sql>
+
+</mapper>

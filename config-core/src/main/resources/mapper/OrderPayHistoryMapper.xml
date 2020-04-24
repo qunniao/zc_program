@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhancheng.core.dao.OrderPayHistoryMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhancheng.core.entity.OrderPayHistory">
+        <id column="id" property="id" />
+        <result column="order_number" property="orderNumber" />
+        <result column="pay_way" property="payWay" />
+        <result column="order_money" property="orderMoney" />
+        <result column="pay_money" property="payMoney" />
+        <result column="pay_json" property="payJson" />
+        <result column="remark" property="remark" />
+        <result column="is_deleted" property="isDeleted" />
+        <result column="gmt_create" property="gmtCreate" />
+        <result column="gmt_modified" property="gmtModified" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, order_number, pay_way, order_money, pay_money, pay_json, remark, is_deleted, gmt_create, gmt_modified
+    </sql>
+
+</mapper>

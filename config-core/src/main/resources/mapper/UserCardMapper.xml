@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhancheng.core.dao.UserCardMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.zhancheng.core.entity.UserCard">
+        <id column="cid" property="cid"/>
+        <result column="name" property="name"/>
+        <result column="company_name" property="companyName"/>
+        <result column="company_position" property="companyPosition"/>
+        <result column="cover" property="cover"/>
+        <result column="phone" property="phone"/>
+        <result column="wechat" property="wechat"/>
+        <result column="email" property="email"/>
+        <result column="address" property="address"/>
+        <result column="address_longitude" property="addressLongitude"/>
+        <result column="address_latitude" property="addressLatitude"/>
+        <result column="intro_text" property="introText"/>
+        <result column="intro_yuyin" property="introYuyin"/>
+        <result column="hometown" property="hometown"/>
+        <result column="school_name" property="schoolName"/>
+        <result column="school_time" property="schoolTime"/>
+        <result column="school_master" property="schoolMaster"/>
+        <result column="school_xueli" property="schoolXueli"/>
+        <result column="is_deleted" property="isDeleted"/>
+        <result column="gmt_create" property="gmtCreate"/>
+        <result column="gmt_modified" property="gmtModified"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        cid, name, company_name, company_position, cover, phone, wechat, email, address, address_longitude, address_latitude,  intro_text, intro_yuyin, hometown, school_name, school_time, school_master, school_xueli, is_deleted, gmt_create, gmt_modified
+    </sql>
+    <select id="queryCardInfo" resultType="UserCardDto">
+    SELECT
+	    zuc.name,
+	    company_name,
+	    company_position,
+	    zuc.phone,
+	    zuc.cover userCover,
+	    zu.cover cardCover,
+	    wechat,
+	    zuc.email,
+	    address,
+	    intro_text,
+	    code_image,
+	    nickname
+
+    FROM
+	    zc_user_card zuc
+	LEFT JOIN zc_user zu ON zuc.uid = zu.uid AND zu.is_deleted = 0
+    WHERE
+	    zuc.uid = #{uid} AND zuc.is_deleted = 0
+    </select>
+
+</mapper>
